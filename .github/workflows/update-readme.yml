@@ -1,0 +1,66 @@
+name: Update commit counts
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: write
+
+jobs:
+  update-readme:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Update commit counts
+        run: |
+          NOVAES=$(git log main --format='%an' | grep -i "Novaes" | wc -l | xargs)
+          PAIVA=$(git log main --format='%an' | grep -i "Paiva" | wc -l | xargs)
+
+          python3 - <<EOF
+          from pathlib import Path
+
+          readme = Path("README.md")
+          content = readme.read_text()
+
+          start = "<!-- COMMIT-COUNT:START -->"
+          end = "<!-- COMMIT-COUNT:END -->"
+
+          section = f"""<!-- COMMIT-COUNT:START -->
+          | Contributor | Commits |
+          |---|---:|
+          | Bernardo Novaes | {NOVAES} |
+          | Guilherme Paiva | {PAIVA} |
+          <!-- COMMIT-COUNT:END -->"""
+
+          start_index = content.index(start)
+          end_index = content.index(end) + len(end)
+
+          content = (
+              content[:start_index]
+              + section
+              + content[end_index:]
+          )
+
+          readme.write_text(content)
+          EOF
+
+      - name: Commit README changes
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          git add README.md
+
+          if git diff --cached --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "docs: update commit counts"
+            git push
+          fi
