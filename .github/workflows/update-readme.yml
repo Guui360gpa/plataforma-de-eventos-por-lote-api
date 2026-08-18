@@ -16,7 +16,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
+      - name: Checkout main
         uses: actions/checkout@v4
         with:
           ref: main
@@ -35,8 +35,12 @@ jobs:
           echo "Novaes commits: $NOVAES"
           echo "Paiva commits: $PAIVA"
 
-          python3 - <<EOF
+          python3 - "$NOVAES" "$PAIVA" <<'PY'
+          import sys
           from pathlib import Path
+
+          novaes = sys.argv[1]
+          paiva = sys.argv[2]
 
           readme = Path("README.md")
           content = readme.read_text()
@@ -47,8 +51,8 @@ jobs:
           section = f"""<!-- COMMIT-COUNT:START -->
           | Developer | Branch | Commits |
           |---|---|---:|
-          | Bernardo Novaes | Novaes | {NOVAES} |
-          | Guilherme Paiva | Paiva | {PAIVA} |
+          | Bernardo Novaes | Novaes | {novaes} |
+          | Guilherme Paiva | Paiva | {paiva} |
           <!-- COMMIT-COUNT:END -->"""
 
           if start not in content or end not in content:
@@ -64,7 +68,7 @@ jobs:
           )
 
           readme.write_text(content)
-          EOF
+          PY
 
       - name: Commit README changes
         run: |
