@@ -129,5 +129,5 @@ docker compose up -d
 
 ## Integrantes
 
-- [Nome 1](https://github.com/usuario1)
-- [Nome 2](https://github.com/usuario2)
+- [Guilherme P. Alves](https://github.com/Guui360gpa)
+- [Bernardo N. Novaes](https://github.com/novaes7be)
