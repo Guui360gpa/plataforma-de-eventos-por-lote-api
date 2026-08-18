@@ -11,6 +11,10 @@ Projeto desenvolvido em dupla como estudo de Spring Boot, Spring Security, JPA e
 ## Contributors
 
 <!-- COMMIT-COUNT:START -->
+| Developer | Branch | Commits |
+|---|---|---:|
+| Bernardo Novaes | Novaes | 4 |
+| Guilherme Paiva | Paiva | 0 |
 <!-- COMMIT-COUNT:END -->
 
 ## Funcionalidades
