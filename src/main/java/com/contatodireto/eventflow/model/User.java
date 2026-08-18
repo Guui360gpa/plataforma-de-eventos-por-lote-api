@@ -1,5 +1,6 @@
 package com.contatodireto.eventflow.model;
 
+import com.contatodireto.eventflow.Enum.Role;
 import jakarta.persistence.*;
 
 @Entity

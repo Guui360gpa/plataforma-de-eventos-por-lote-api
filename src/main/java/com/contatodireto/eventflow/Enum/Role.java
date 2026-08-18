@@ -1,4 +1,4 @@
-package com.contatodireto.eventflow.model;
+package com.contatodireto.eventflow.Enum;
 
 public enum Role {
 
