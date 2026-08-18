@@ -1,8 +1,10 @@
-name: Update commit counts
+name: Update branch commit counts
 
 on:
   push:
     branches:
+      - Novaes
+      - Paiva
       - main
 
 permissions:
@@ -18,10 +20,13 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Update commit counts
+      - name: Count branch commits
         run: |
-          NOVAES=$(git log main --format='%an' | grep -i "Novaes" | wc -l | xargs)
-          PAIVA=$(git log main --format='%an' | grep -i "Paiva" | wc -l | xargs)
+          git fetch origin Novaes
+          git fetch origin Paiva
+
+          NOVAES=$(git rev-list --count origin/Novaes)
+          PAIVA=$(git rev-list --count origin/Paiva)
 
           python3 - <<EOF
           from pathlib import Path
@@ -33,10 +38,10 @@ jobs:
           end = "<!-- COMMIT-COUNT:END -->"
 
           section = f"""<!-- COMMIT-COUNT:START -->
-          | Contributor | Commits |
-          |---|---:|
-          | Bernardo Novaes | {NOVAES} |
-          | Guilherme Paiva | {PAIVA} |
+          | Developer | Branch | Commits |
+          |---|---|---:|
+          | Bernardo Novaes | Novaes | {NOVAES} |
+          | Guilherme Paiva | Paiva | {PAIVA} |
           <!-- COMMIT-COUNT:END -->"""
 
           start_index = content.index(start)
@@ -61,6 +66,6 @@ jobs:
           if git diff --cached --quiet; then
             echo "No changes to commit"
           else
-            git commit -m "docs: update commit counts"
+            git commit -m "docs: update branch commit counts"
             git push
           fi
