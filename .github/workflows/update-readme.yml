@@ -6,6 +6,7 @@ on:
       - Novaes
       - Paiva
       - main
+  workflow_dispatch:
 
 permissions:
   contents: write
@@ -18,15 +19,21 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
+          ref: main
           fetch-depth: 0
 
-      - name: Count branch commits
+      - name: Fetch development branches
         run: |
-          git fetch origin Novaes
-          git fetch origin Paiva
+          git fetch origin Novaes:Novaes
+          git fetch origin Paiva:Paiva
 
-          NOVAES=$(git rev-list --count origin/Novaes)
-          PAIVA=$(git rev-list --count origin/Paiva)
+      - name: Count commits
+        run: |
+          NOVAES=$(git rev-list --count Novaes --not main)
+          PAIVA=$(git rev-list --count Paiva --not main)
+
+          echo "Novaes commits: $NOVAES"
+          echo "Paiva commits: $PAIVA"
 
           python3 - <<EOF
           from pathlib import Path
@@ -43,6 +50,9 @@ jobs:
           | Bernardo Novaes | Novaes | {NOVAES} |
           | Guilherme Paiva | Paiva | {PAIVA} |
           <!-- COMMIT-COUNT:END -->"""
+
+          if start not in content or end not in content:
+              raise SystemExit("Commit count markers not found in README.md")
 
           start_index = content.index(start)
           end_index = content.index(end) + len(end)
@@ -67,5 +77,5 @@ jobs:
             echo "No changes to commit"
           else
             git commit -m "docs: update branch commit counts"
-            git push
+            git push origin main
           fi
