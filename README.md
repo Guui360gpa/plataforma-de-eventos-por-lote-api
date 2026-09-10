@@ -8,6 +8,15 @@ Quando um lote de ingressos esgota, o próximo é liberado automaticamente. O si
 
 Projeto desenvolvido em dupla como estudo de Spring Boot, Spring Security, JPA e testes automatizados (JUnit 5 + Mockito), com fluxo de trabalho baseado em feature branches e Pull Requests no GitHub.
 
+## Contributors
+
+<!-- COMMIT-COUNT:START -->
+| Developer | Branch | Commits |
+|---|---|---:|
+| Bernardo Novaes | Novaes | 6 |
+| Guilherme Paiva | Paiva | 5 |
+<!-- COMMIT-COUNT:END -->
+
 ## Funcionalidades
 
 - Cadastro e autenticação de usuários com JWT (access token curto) e refresh token (armazenado no banco, revogável)
