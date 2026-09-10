@@ -1,0 +1,85 @@
+name: Update branch commit counts
+
+on:
+  push:
+    branches:
+      - Novaes
+      - Paiva
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  update-readme:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Fetch development branches
+        run: |
+          git fetch origin Novaes:Novaes
+          git fetch origin Paiva:Paiva
+
+      - name: Count commits
+        run: |
+          NOVAES=$(git rev-list --count Novaes --not main)
+          PAIVA=$(git rev-list --count Paiva --not main)
+
+          echo "Novaes commits: $NOVAES"
+          echo "Paiva commits: $PAIVA"
+
+          python3 - "$NOVAES" "$PAIVA" <<'PY'
+          import sys
+          from pathlib import Path
+
+          novaes = sys.argv[1]
+          paiva = sys.argv[2]
+
+          readme = Path("README.md")
+          content = readme.read_text()
+
+          start = "<!-- COMMIT-COUNT:START -->"
+          end = "<!-- COMMIT-COUNT:END -->"
+
+          section = f"""<!-- COMMIT-COUNT:START -->
+          | Developer | Branch | Commits |
+          |---|---|---:|
+          | Bernardo Novaes | Novaes | {novaes} |
+          | Guilherme Paiva | Paiva | {paiva} |
+          <!-- COMMIT-COUNT:END -->"""
+
+          if start not in content or end not in content:
+              raise SystemExit("Commit count markers not found in README.md")
+
+          start_index = content.index(start)
+          end_index = content.index(end) + len(end)
+
+          content = (
+              content[:start_index]
+              + section
+              + content[end_index:]
+          )
+
+          readme.write_text(content)
+          PY
+
+      - name: Commit README changes
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          git add README.md
+
+          if git diff --cached --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "docs: update branch commit counts"
+            git push origin main
+          fi
